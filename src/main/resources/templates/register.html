@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - E2EE Chat</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: linear-gradient(135deg, #f0f2f5 0%, #e5e7eb 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .auth-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+        .auth-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .auth-header h2 {
+            color: #1f2937;
+            margin: 0 0 8px 0;
+            font-weight: 700;
+        }
+        .auth-header p {
+            color: #6b7280;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+        .e2ee-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #ecfdf5;
+            color: #059669;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 12px;
+        }
+        .e2ee-badge svg {
+            width: 14px;
+            height: 14px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            color: #374151;
+            font-size: 0.875rem;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background: #f9fafb;
+            color: #1f2937;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.15s;
+        }
+        .form-group input::placeholder {
+            color: #9ca3af;
+        }
+        .form-group input:focus {
+            border-color: #4f46e5;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: #4f46e5;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        .error-msg {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        .auth-footer {
+            text-align: center;
+            margin-top: 24px;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        .auth-footer a {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+        .logo {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .logo svg {
+            width: 28px;
+            height: 28px;
+            color: #fff;
+        }
+        .hint {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-top: 6px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e5e7eb;
+            border-top-color: #4f46e5;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+            </div>
+            <h2>Create Secure Account</h2>
+            <p>End-to-End Encrypted Messaging</p>
+            <div class="e2ee-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                E2EE Protected
+            </div>
+        </div>
+
+        <div class="error-msg" id="error"></div>
+        <div class="loading" id="loading">
+            <span class="spinner"></span>
+            Generating encryption keys...
+        </div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Choose a username" required minlength="3">
+                <div class="hint">At least 3 characters</div>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Create a password" required minlength="6">
+                <div class="hint">At least 6 characters</div>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+            </div>
+            <button type="submit" class="btn-primary" id="submitBtn">Create Secure Account</button>
+        </form>
+
+        <div class="auth-footer">
+            Already have an account? <a href="/login">Sign in</a>
+        </div>
+    </div>
+
+    <script>
+    /**
+     * =====================================================================
+     * E2EE KEY GENERATION - CLIENT SIDE
+     * =====================================================================
+     *
+     * This script generates RSA key pairs for End-to-End Encryption.
+     *
+     * SECURITY:
+     * - Private key is stored ONLY in localStorage (never sent to server)
+     * - Public key is sent to server for other users to encrypt messages
+     * - All encryption/decryption happens in the browser
+     *
+     * KEY SPECIFICATIONS:
+     * - Algorithm: RSA-OAEP
+     * - Modulus: 2048 bits
+     * - Hash: SHA-256
+     * =====================================================================
+     */
+
+    // Generate RSA key pair for E2EE
+    async function generateKeyPair() {
+        const keyPair = await window.crypto.subtle.generateKey(
+            {
+                name: "RSA-OAEP",
+                modulusLength: 2048,
+                publicExponent: new Uint8Array([1, 0, 1]),
+                hash: "SHA-256"
+            },
+            true, // extractable
+            ["encrypt", "decrypt"]
+        );
+        return keyPair;
+    }
+
+    // Export public key to Base64 (SPKI format) - sent to server
+    async function exportPublicKey(publicKey) {
+        const exported = await window.crypto.subtle.exportKey("spki", publicKey);
+        return arrayBufferToBase64(exported);
+    }
+
+    // Export private key to Base64 (PKCS8 format) - stored locally only
+    async function exportPrivateKey(privateKey) {
+        const exported = await window.crypto.subtle.exportKey("pkcs8", privateKey);
+        return arrayBufferToBase64(exported);
+    }
+
+    // Helper: ArrayBuffer to Base64
+    function arrayBufferToBase64(buffer) {
+        const bytes = new Uint8Array(buffer);
+        let binary = '';
+        for (let i = 0; i < bytes.length; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return window.btoa(binary);
+    }
+
+    // Registration form handler
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const errorDiv = document.getElementById('error');
+        const loadingDiv = document.getElementById('loading');
+        const submitBtn = document.getElementById('submitBtn');
+
+        errorDiv.style.display = 'none';
+
+        if (password !== confirmPassword) {
+            errorDiv.textContent = 'Passwords do not match';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        try {
+            // Show loading state while generating keys
+            loadingDiv.style.display = 'block';
+            submitBtn.disabled = true;
+
+            // STEP 1: Generate RSA key pair for E2EE
+            console.log('Generating E2EE key pair...');
+            const keyPair = await generateKeyPair();
+
+            // STEP 2: Export keys
+            const publicKeyBase64 = await exportPublicKey(keyPair.publicKey);
+            const privateKeyBase64 = await exportPrivateKey(keyPair.privateKey);
+
+            console.log('Keys generated successfully');
+
+            // STEP 3: Register with server (send only public key!)
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username,
+                    password,
+                    publicKey: publicKeyBase64  // Only public key goes to server
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // STEP 4: Store credentials and PRIVATE key locally
+                // CRITICAL: Private key NEVER leaves this device!
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('username', data.username);
+                localStorage.setItem('privateKey', privateKeyBase64);  // Local storage only!
+                localStorage.setItem('publicKey', publicKeyBase64);
+                localStorage.setItem('e2ee_user', data.username);
+
+                console.log('Registration complete. Private key stored locally.');
+                window.location.href = '/chat';
+            } else {
+                errorDiv.textContent = data.message || 'Registration failed';
+                errorDiv.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Registration error:', error);
+            errorDiv.textContent = 'Error generating encryption keys. Please try again.';
+            errorDiv.style.display = 'block';
+        } finally {
+            loadingDiv.style.display = 'none';
+            submitBtn.disabled = false;
+        }
+    });
+    </script>
+</body>
+</html>
